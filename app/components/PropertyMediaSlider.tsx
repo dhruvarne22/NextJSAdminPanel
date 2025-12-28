@@ -23,11 +23,11 @@ export default function PropertyMediaCarousel({
   youtubeVideo?: string | null;
 }) {
   const media: MediaItem[] = [
-    ...images.map((img) => ({ type: "image", src: img })),
+    ...images.map((img) => ({ type: "image" as const, src: img })),
     ...(youtubeVideo
       ? [
           {
-            type: "video",
+            type: "video" as const,
             src: youtubeVideo
               .replace("watch?v=", "embed/")
               .split("&")[0],
