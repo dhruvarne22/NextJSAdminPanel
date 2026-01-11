@@ -6,6 +6,8 @@ import StatusBadge from "@/app/components/StatusBadge";
 import { notFound } from "next/navigation";
 import { PropertyStatus, STATUS_MAP } from "@/lib/status";
 import PropertyMediaSlider from "@/app/components/PropertyMediaSlider";
+import PropertyHighlightsForm from "./PropertyHighlight";
+import PropertyAboutForm from "./PropertyAboutForm";
 
 export default async function PropertyDetailPage({
   params,
@@ -58,6 +60,21 @@ const { data: activityLogs } = await supabaseServer
         <Detail label="Area (Sq Yd)" value={property.totalAreaSqYd} />
         <Detail label="Total Cost" value={`₹ ${property.totalCost}`} />
       </div>
+
+
+{/* ===== PROPERTY CONTENT ===== */}
+<PropertyHighlightsForm
+  propertyId={propertyId}
+  initialHighlights={property.highlights}
+/>
+
+<PropertyAboutForm
+
+  propertyId={propertyId}
+  initialValue={property.about_property}
+/>
+
+
 
       {/* ===== STATUS ACTION ===== */}
       <StatusUpdateForm
