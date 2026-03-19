@@ -7,6 +7,8 @@ import {
   Clock, CheckCircle2, XCircle, MessageSquare,
   ShieldCheck, AlertTriangle
 } from "lucide-react";
+import { useRouter } from "next/navigation";
+
 
 const STATUS_OPTIONS: {
   value: PropertyStatus;
@@ -60,13 +62,13 @@ export default function StatusUpdateForm({
 
   const isChanged  = status !== currentStatus;
   const canSubmit  = comment.trim().length >= 3 && !loading;
-
+  const router = useRouter();      
   async function submit() {
     setLoading(true);
     await updatePropertyStatus(propertyId, status, comment);
     setLoading(false);
     setDone(true);
-    setTimeout(() => { setDone(false); window.location.reload(); }, 1500);
+    setTimeout(() => { setDone(false); router.refresh(); }, 1500);
   }
 
   const selected = STATUS_OPTIONS.find((o) => o.value === status)!;

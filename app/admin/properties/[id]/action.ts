@@ -2,6 +2,7 @@
 
 import { supabaseServer } from "@/lib/supabase/server";
 import { PropertyStatus } from "@/lib/types";
+import { revalidatePath } from "next/cache";
 
 /* ==============================
    UPDATE PROPERTY STATUS
@@ -36,6 +37,13 @@ export async function updatePropertyStatus(
     activity_type: "STATUS_CHANGE",
     admin_uid: "admin",
   });
+
+
+    // 3. ✅ Tell Next.js to re-fetch this page's data
+  revalidatePath(`/admin/properties/${propertyId}`);
+  revalidatePath(`/admin/properties`);
+  revalidatePath(`/admin/requests`);
+  revalidatePath(`/admin`);
 }
 
 /* ==============================
