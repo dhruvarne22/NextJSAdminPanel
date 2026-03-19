@@ -24,6 +24,8 @@ export default async function RequestsPage() {
   const properties = (data ?? []) as Property[];
 
   const total    = properties.length;
+  console.log("properties");
+  console.log(properties);
   const waiting  = properties.filter((p) => p.status === "W").length;
   const approved = properties.filter((p) => p.status === "Y").length;
   const rejected = properties.filter((p) => p.status === "N").length;
