@@ -1,3 +1,4 @@
+// admim/requests/page.tsx
 import { supabaseServer } from "@/lib/supabase/server";
 import { PropertyStatus } from "@/lib/status";
 import RequestsListWithFilter from "@/app/components/RequestFilter";

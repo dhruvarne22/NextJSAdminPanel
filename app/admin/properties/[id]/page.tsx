@@ -91,7 +91,7 @@ export default async function PropertyDetailPage({
 
             {/* Media */}
             <div className="bg-white rounded-2xl overflow-hidden border border-[#EDEDED] shadow-sm">
-              <PropertyMediaSlider images={images} youtubeVideo={property.youtubeVideo} />
+              <PropertyMediaSlider images={images} youtubeVideo={property.youtubeVideo} propertyId={propertyId} />
             </div>
 
             {/* Property Details Grid */}

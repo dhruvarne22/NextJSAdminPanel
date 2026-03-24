@@ -1,3 +1,4 @@
+// app/page.tsx
 import Link from "next/link";
 import AdminSidebar from "./components/admin/AdminSidebar";
 import { supabaseServer } from "@/lib/supabase/server";

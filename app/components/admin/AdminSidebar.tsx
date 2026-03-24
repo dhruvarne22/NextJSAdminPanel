@@ -6,7 +6,8 @@ import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/s
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import {
   LayoutDashboard, InboxIcon, Building2, Menu,
-  ShieldCheck, ChevronRight
+  ShieldCheck, ChevronRight,
+  TrendingUp
 } from "lucide-react";
 import { useState } from "react";
 
@@ -15,6 +16,7 @@ const NAV_ITEMS = [
   { label: "Dashboard",  href: "/admin",             icon: LayoutDashboard },
   { label: "Requests",   href: "/admin/requests",    icon: InboxIcon       },
   { label: "Properties", href: "/admin/properties",  icon: Building2       },
+  { label: "Investment", href: "/admin/investment",  icon: TrendingUp       },
 ];
 
 // ─────────────────────────── SIDEBAR CONTENT ─────────────────────────────────
