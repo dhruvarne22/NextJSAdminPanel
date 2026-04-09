@@ -1,11 +1,10 @@
-// app/page.tsx
 import Link from "next/link";
 import AdminSidebar from "./components/admin/AdminSidebar";
 import { supabaseServer } from "@/lib/supabase/server";
 import {
   Building2, InboxIcon, CheckCircle2,
   XCircle, Clock, ArrowRight, TrendingUp,
-  Activity, Zap
+  Activity, PhoneCall, Users
 } from "lucide-react";
 
 // ─────────────────────────── DATA FETCH ──────────────────────────────────────
@@ -16,6 +15,9 @@ async function getDashboardStats() {
     { count: approved },
     { count: rejected },
     { data: recent },
+    { count: totalContacts },
+    { count: todayContacts },
+    { count: investmentInterests },
   ] = await Promise.all([
     supabaseServer.from("properties").select("*", { count: "exact", head: true }),
     supabaseServer.from("properties").select("*", { count: "exact", head: true }).eq("status", "W"),
@@ -26,14 +28,21 @@ async function getDashboardStats() {
       .select("id, name, location, status, createdAt")
       .order("createdAt", { ascending: false })
       .limit(5),
+    supabaseServer.from("property_intrested").select("*", { count: "exact", head: true }),
+    supabaseServer.from("property_intrested").select("*", { count: "exact", head: true })
+      .gte("created_at", new Date(new Date().setHours(0, 0, 0, 0)).toISOString()),
+    supabaseServer.from("investment").select("*", { count: "exact", head: true }),
   ]);
 
   return {
-    total:    total    ?? 0,
-    pending:  pending  ?? 0,
-    approved: approved ?? 0,
-    rejected: rejected ?? 0,
-    recent:   recent   ?? [],
+    total:               total               ?? 0,
+    pending:             pending             ?? 0,
+    approved:            approved            ?? 0,
+    rejected:            rejected            ?? 0,
+    recent:              recent              ?? [],
+    totalContacts:       totalContacts       ?? 0,
+    todayContacts:       todayContacts       ?? 0,
+    investmentInterests: investmentInterests ?? 0,
   };
 }
 
@@ -173,6 +182,32 @@ export default async function AdminHome() {
             />
           </div>
 
+          {/* ── ENGAGEMENT STATS ──────────────────────────────────────── */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <StatCard
+              label="Total Contacts"
+              value={stats.totalContacts}
+              icon={<PhoneCall size={16} />}
+              href="/admin/contacts"
+              variant="blue"
+            />
+            <StatCard
+              label="Contacts Today"
+              value={stats.todayContacts}
+              icon={<PhoneCall size={16} />}
+              href="/admin/contacts"
+              variant="blue"
+              pulse={stats.todayContacts > 0}
+            />
+            <StatCard
+              label="Investment Interest"
+              value={stats.investmentInterests}
+              icon={<TrendingUp size={16} />}
+              href="/admin/investment-images"
+              variant="purple"
+            />
+          </div>
+
           {/* ── TWO-COLUMN ─────────────────────────────────────────────── */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
@@ -230,7 +265,7 @@ export default async function AdminHome() {
             </div>
 
             {/* Quick nav cards */}
-            <div className="space-y-4">
+            <div className="space-y-3">
               <QuickNavCard
                 href="/admin/requests"
                 icon={<InboxIcon size={20} />}
@@ -240,17 +275,26 @@ export default async function AdminHome() {
                 badgeColor="amber"
               />
               <QuickNavCard
+                href="/admin/contacts"
+                icon={<PhoneCall size={20} />}
+                title="Contact Requests"
+                description="See who clicked Contact on each property"
+                badge={stats.totalContacts > 0 ? `${stats.totalContacts} total` : undefined}
+                badgeColor="blue"
+              />
+              <QuickNavCard
+                href="/admin/investment-images"
+                icon={<TrendingUp size={20} />}
+                title="Investment Images"
+                description="Manage investment gallery and interest list"
+                badge={stats.investmentInterests > 0 ? `${stats.investmentInterests} interested` : undefined}
+                badgeColor="purple"
+              />
+              <QuickNavCard
                 href="/admin/properties"
                 icon={<Building2 size={20} />}
                 title="All Properties"
                 description="Browse, search and manage every listing"
-              />
-              <QuickNavCard
-                href="/admin"
-                icon={<TrendingUp size={20} />}
-                title="Analytics"
-                description="View property stats and trends"
-                comingSoon
               />
             </div>
           </div>
@@ -268,14 +312,16 @@ function StatCard({
   value: number;
   icon: React.ReactNode;
   href: string;
-  variant: "default" | "amber" | "green" | "red";
+  variant: "default" | "amber" | "green" | "red" | "blue" | "purple";
   pulse?: boolean;
 }) {
   const styles = {
-    default: { card: "bg-white border-[#EDEDED]", icon: "bg-[#0D0D0D] text-white",    val: "text-[#0D0D0D]", lbl: "text-[#B0B0B0]" },
-    amber:   { card: "bg-amber-50 border-amber-100",  icon: "bg-amber-500 text-white",    val: "text-amber-700", lbl: "text-amber-500" },
-    green:   { card: "bg-green-50 border-green-100",  icon: "bg-green-500 text-white",    val: "text-green-700", lbl: "text-green-500" },
-    red:     { card: "bg-red-50 border-red-100",      icon: "bg-red-500 text-white",      val: "text-red-700",   lbl: "text-red-400"  },
+    default: { card: "bg-white border-[#EDEDED]",         icon: "bg-[#0D0D0D] text-white",     val: "text-[#0D0D0D]",  lbl: "text-[#B0B0B0]"  },
+    amber:   { card: "bg-amber-50 border-amber-100",      icon: "bg-amber-500 text-white",     val: "text-amber-700",  lbl: "text-amber-500"  },
+    green:   { card: "bg-green-50 border-green-100",      icon: "bg-green-500 text-white",     val: "text-green-700",  lbl: "text-green-500"  },
+    red:     { card: "bg-red-50 border-red-100",          icon: "bg-red-500 text-white",       val: "text-red-700",    lbl: "text-red-400"    },
+    blue:    { card: "bg-blue-50 border-blue-100",        icon: "bg-blue-500 text-white",      val: "text-blue-700",   lbl: "text-blue-400"   },
+    purple:  { card: "bg-purple-50 border-purple-100",    icon: "bg-purple-500 text-white",    val: "text-purple-700", lbl: "text-purple-400" },
   }[variant];
 
   return (
@@ -307,7 +353,7 @@ function QuickNavCard({
   title: string;
   description: string;
   badge?: string;
-  badgeColor?: "amber";
+  badgeColor?: "amber" | "blue" | "purple";
   comingSoon?: boolean;
 }) {
   const Comp = comingSoon ? "div" : Link;

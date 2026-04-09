@@ -1,22 +1,22 @@
 "use client";
-
+import LogoutButton from "./LoginButton";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import {
   LayoutDashboard, InboxIcon, Building2, Menu,
-  ShieldCheck, ChevronRight,
-  TrendingUp
+  ShieldCheck, ChevronRight, TrendingUp, PhoneCall
 } from "lucide-react";
 import { useState } from "react";
 
 // ─────────────────────────── NAV CONFIG ──────────────────────────────────────
 const NAV_ITEMS = [
-  { label: "Dashboard",  href: "/admin",             icon: LayoutDashboard },
-  { label: "Requests",   href: "/admin/requests",    icon: InboxIcon       },
-  { label: "Properties", href: "/admin/properties",  icon: Building2       },
-  { label: "Investment", href: "/admin/investment",  icon: TrendingUp       },
+  { label: "Dashboard",   href: "/admin",                   icon: LayoutDashboard },
+  { label: "Requests",    href: "/admin/requests",          icon: InboxIcon       },
+  { label: "Properties",  href: "/admin/properties",        icon: Building2       },
+  { label: "Investment",  href: "/admin/investment-images", icon: TrendingUp      },
+  { label: "Contacts",    href: "/admin/contacts",          icon: PhoneCall       },
 ];
 
 // ─────────────────────────── SIDEBAR CONTENT ─────────────────────────────────
@@ -77,8 +77,8 @@ function SidebarContent({ onClick }: { onClick?: () => void }) {
         })}
       </nav>
 
-      {/* ── BOTTOM: admin badge ───────────────────────────────────────── */}
-      <div className="px-4 py-5 border-t border-white/[0.06]">
+      {/* ── BOTTOM: admin badge + logout ──────────────────────────────── */}
+      <div className="px-4 py-4 border-t border-white/[0.06] space-y-2">
         <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-white/[0.05]">
           <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
             <ShieldCheck size={14} className="text-[#B0B0B0]" />
@@ -87,9 +87,9 @@ function SidebarContent({ onClick }: { onClick?: () => void }) {
             <p className="text-xs font-semibold text-white truncate">Admin</p>
             <p className="text-[10px] text-[#B0B0B0]">Full access</p>
           </div>
-          {/* Online dot */}
           <div className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0 ml-auto shadow-[0_0_6px_rgba(34,197,94,0.6)]" />
         </div>
+        <LogoutButton />
       </div>
     </div>
   );
