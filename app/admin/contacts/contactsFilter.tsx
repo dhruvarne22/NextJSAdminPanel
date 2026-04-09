@@ -12,12 +12,19 @@ import {
 } from "lucide-react";
 
 // ─────────────────────────── HELPERS ─────────────────────────────────────────
-function timeAgo(dateStr: string) {
-  // Supabase returns "2026-04-09 20:24:02+00" (space, not T).
-  // Normalise to ISO 8601 so every JS engine parses it correctly.
-  const normalized = dateStr.replace(" ", "T");
-  const diff = Date.now() - new Date(normalized).getTime();
-  if (diff < 0) return "just now";
+// Normalize Supabase timestamp to proper UTC before parsing
+// Supabase returns "2026-04-09 21:07:12.609+00" — not valid ISO 8601
+function parseDate(raw: string): Date {
+  const n = raw
+    .replace(" ", "T")
+    .replace(/([+-]\d{2})$/, "$1:00")  // +00 → +00:00
+    .replace(/\+00:00$/, "Z");          // +00:00 → Z
+  return new Date(n);
+}
+
+function timeAgo(dateStr: string): string {
+  const diff = Date.now() - parseDate(dateStr).getTime();
+  if (diff < 0)       return "just now";
   const mins  = Math.floor(diff / 60000);
   const hours = Math.floor(diff / 3600000);
   const days  = Math.floor(diff / 86400000);
@@ -28,11 +35,11 @@ function timeAgo(dateStr: string) {
   return `${Math.floor(days / 30)}mo ago`;
 }
 
-function formatDate(dateStr: string) {
-  const normalized = dateStr.replace(" ", "T");
-  return new Date(normalized).toLocaleDateString("en-IN", {
+function formatDate(dateStr: string): string {
+  return parseDate(dateStr).toLocaleString("en-IN", {
     day: "2-digit", month: "short", year: "numeric",
     hour: "2-digit", minute: "2-digit",
+    hour12: true, timeZone: "Asia/Kolkata",
   });
 }
 
