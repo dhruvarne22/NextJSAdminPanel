@@ -2,6 +2,7 @@ import AdminFooter from "../components/admin/AdminFooter";
 import AdminHeader from "../components/admin/AdminHeader";
 import AdminSidebar from "../components/admin/AdminSidebar";
 
+export const dynamic = "force-dynamic";
 
 export default function AdminLayout({
   children,
