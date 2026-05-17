@@ -1,7 +1,8 @@
 "use server";
 
+import { sendNotification } from "@/lib/sendnotification";
 import { supabaseServer } from "@/lib/supabase/server";
-import { PropertyStatus } from "@/lib/types";
+
 import { revalidatePath } from "next/cache";
 
 /* ==============================
@@ -9,41 +10,78 @@ import { revalidatePath } from "next/cache";
 ================================ */
 export async function updatePropertyStatus(
   propertyId: number,
-  newStatus: PropertyStatus,
+  status: string,
   comment: string
 ) {
-  if (!comment || comment.trim().length < 3) {
-    throw new Error("Comment is mandatory");
-  }
+  // 1. Update status in DB
+  await supabaseServer
+    .from("properties")
+    .update({ status, admin: comment })
+    .eq("id", propertyId);
 
+  // 2. Log activity
+  await supabaseServer.from("property_activity_log").insert({
+    property_id:   propertyId,
+    activity_type: "STATUS_CHANGE",
+    to_status:     status,
+    comment:       comment,
+  });
+
+  // 3. Fetch property details for notification
   const { data: property } = await supabaseServer
     .from("properties")
-    .select("status")
+    .select("name, uid")
     .eq("id", propertyId)
     .single();
 
-  if (!property) throw new Error("Property not found");
+  if (property) {
 
-  await supabaseServer
-    .from("properties")
-    .update({ status: newStatus })
-    .eq("id", propertyId);
-
-  await supabaseServer.from("property_activity_log").insert({
-    property_id: propertyId,
-    from_status: property.status,
-    to_status: newStatus,
-    comment,
-    activity_type: "STATUS_CHANGE",
-    admin_uid: "admin",
-  });
+    if (status === "Y") {
+      // Approved → notify ALL users
+      await sendNotification({
+        target: { type: "all" },
+        title:  "New Property Available 🏠",
+        body:   `${property.name} is now live on Vardaan!`,
+        data:   { type: "property_approved", property_id: String(propertyId) },
+      });
 
 
-    // 3. ✅ Tell Next.js to re-fetch this page's data
+         await sendNotification({
+        target: { type: "uid", uid: property.uid },
+        title:  "Property Approved!",
+        body:   `Your ${property.name} is live on Vardaan.`,
+        data:   { type: "property_rejected", property_id: String(propertyId) },
+      });
+    }
+
+    if (status === "N") {
+      // Rejected → notify only the owner
+      await sendNotification({
+        target: { type: "uid", uid: property.uid },
+        title:  "Property Update Required",
+        body:   "Your listing needs changes. Tap to view admin feedback.",
+        data:   { type: "property_rejected", property_id: String(propertyId) },
+      });
+    }
+
+
+        if (status === "W") {
+      // Rejected → notify only the owner
+      await sendNotification({
+        target: { type: "uid", uid: property.uid },
+        title:  `${property.name} - Status Changed`,
+        body:   "Your listing went to WAITING status. Tap to view admin feedback.",
+        data:   { type: "property_rejected", property_id: String(propertyId) },
+      });
+    }
+
+  }
+
+  // 4. Revalidate pages
   revalidatePath(`/admin/properties/${propertyId}`);
-  revalidatePath(`/admin/properties`);
-  revalidatePath(`/admin/requests`);
-  revalidatePath(`/admin`);
+  revalidatePath("/admin/properties");
+  revalidatePath("/admin/requests");
+  revalidatePath("/admin");
 }
 
 /* ==============================

@@ -1,22 +1,25 @@
 "use client";
+
 import LogoutButton from "./LoginButton";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import {
   LayoutDashboard, InboxIcon, Building2, Menu,
-  ShieldCheck, ChevronRight, TrendingUp, PhoneCall
+  ShieldCheck, ChevronRight, TrendingUp, PhoneCall, Bell
 } from "lucide-react";
 import { useState } from "react";
 
 // ─────────────────────────── NAV CONFIG ──────────────────────────────────────
 const NAV_ITEMS = [
-  { label: "Dashboard",   href: "/admin",                   icon: LayoutDashboard },
-  { label: "Requests",    href: "/admin/requests",          icon: InboxIcon       },
-  { label: "Properties",  href: "/admin/properties",        icon: Building2       },
-  { label: "Investment",  href: "/admin/investment-images", icon: TrendingUp      },
-  { label: "Contacts",    href: "/admin/contacts",          icon: PhoneCall       },
+  { label: "Dashboard",     href: "/admin",                   icon: LayoutDashboard },
+  { label: "Requests",      href: "/admin/requests",          icon: InboxIcon       },
+  { label: "Properties",    href: "/admin/properties",        icon: Building2       },
+  { label: "Investment",    href: "/admin/investment-images", icon: TrendingUp      },
+  { label: "Contacts",      href: "/admin/contacts",          icon: PhoneCall       },
+  { label: "Notifications", href: "/admin/notifications",     icon: Bell            },
 ];
 
 // ─────────────────────────── SIDEBAR CONTENT ─────────────────────────────────
