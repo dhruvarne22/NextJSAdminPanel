@@ -17,7 +17,7 @@ const NAV_ITEMS = [
   { label: "Dashboard",     href: "/admin",                   icon: LayoutDashboard },
   { label: "Requests",      href: "/admin/requests",          icon: InboxIcon       },
   { label: "Properties",    href: "/admin/properties",        icon: Building2       },
-  { label: "Investment",    href: "/admin/investment-images", icon: TrendingUp      },
+  { label: "Investment",    href: "/admin/investment", icon: TrendingUp      },
   { label: "Contacts",      href: "/admin/contacts",          icon: PhoneCall       },
   { label: "Notifications", href: "/admin/notifications",     icon: Bell            },
 ];
